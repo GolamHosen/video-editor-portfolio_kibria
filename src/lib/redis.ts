@@ -35,9 +35,16 @@ export const CACHE_TTL = {
 export async function getCached<T>(key: string): Promise<T | null> {
   if (!redis) return null;
   try {
-    const data = await redis.get(key);
-    if (!data) return null;
-    return JSON.parse(data) as T;
+    const data = await redis.get<T | string>(key);
+    if (data === null || data === undefined) return null;
+    if (typeof data === "string") {
+      try {
+        return JSON.parse(data) as T;
+      } catch {
+        return data as unknown as T;
+      }
+    }
+    return data as T;
   } catch {
     return null;
   }
