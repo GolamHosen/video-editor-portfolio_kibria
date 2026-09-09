@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Project, Category, Media } from "@/models";
-import { getCached, setCache, CACHE_KEYS, CACHE_TTL } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -11,13 +10,6 @@ export async function GET(
 ) {
   try {
     const { slug } = await params;
-    const cacheKey = CACHE_KEYS.PROJECT(slug);
-
-    const cached = await getCached(cacheKey);
-    if (cached) {
-      return NextResponse.json({ data: cached, cached: true });
-    }
-
     await connectToDatabase();
     const proj = await Project.findOne({ slug, status: "published" }).lean();
 
@@ -70,8 +62,6 @@ export async function GET(
         height: m.height || null,
       })),
     };
-
-    await setCache(cacheKey, fullProject, CACHE_TTL.LONG);
 
     return NextResponse.json({ data: fullProject });
   } catch (error) {

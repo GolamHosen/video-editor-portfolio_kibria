@@ -3,7 +3,6 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Category } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
-import { invalidateCache, CACHE_KEYS } from "@/lib/redis";
 import { isDatabaseOnline } from "@/lib/dbHealth";
 
 export const dynamic = "force-dynamic";
@@ -45,8 +44,6 @@ export async function POST(request: NextRequest) {
       ...parsed.data,
       id: nextId,
     });
-
-    await invalidateCache(CACHE_KEYS.CATEGORIES);
 
     return NextResponse.json({ data: cat }, { status: 201 });
   } catch (error) {

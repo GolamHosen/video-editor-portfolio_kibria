@@ -4,7 +4,6 @@ import { Project, Category } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
 import { slugify } from "@/lib/utils";
-import { invalidateCache, CACHE_KEYS } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -111,8 +110,6 @@ export async function POST(request: NextRequest) {
       id: nextId,
       slug,
     });
-
-    await invalidateCache([CACHE_KEYS.ALL_PROJECTS, CACHE_KEYS.FEATURED_PROJECTS]);
 
     return NextResponse.json({ data: newProject }, { status: 201 });
   } catch (error) {

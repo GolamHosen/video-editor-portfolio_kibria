@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Project, Category } from "@/models";
-import { getCached, setCache, CACHE_KEYS, CACHE_TTL } from "@/lib/redis";
 
 export const dynamic = "force-dynamic";
 
@@ -11,17 +10,6 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const featured = searchParams.get("featured");
     const limit = parseInt(searchParams.get("limit") || "50");
-
-    const cacheKey = featured
-      ? CACHE_KEYS.FEATURED_PROJECTS
-      : category
-      ? `portfolio:projects:${category}`
-      : CACHE_KEYS.ALL_PROJECTS;
-
-    const cached = await getCached(cacheKey);
-    if (cached) {
-      return NextResponse.json({ data: cached, cached: true });
-    }
 
     await connectToDatabase();
 
@@ -62,8 +50,6 @@ export async function GET(request: NextRequest) {
         categorySlug: cat?.slug || null,
       };
     });
-
-    await setCache(cacheKey, data, CACHE_TTL.MEDIUM);
 
     return NextResponse.json({ data });
   } catch (error) {

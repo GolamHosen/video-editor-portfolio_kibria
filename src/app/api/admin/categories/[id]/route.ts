@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Category, Project } from "@/models";
 import { verifyToken } from "@/lib/auth";
-import { invalidateCache, CACHE_KEYS } from "@/lib/redis";
 import { isDatabaseOnline } from "@/lib/dbHealth";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +45,6 @@ export async function DELETE(
     }
 
     await Category.deleteOne({ id: catId });
-    await invalidateCache(CACHE_KEYS.CATEGORIES);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -4,7 +4,6 @@ import { Project, Media } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
 import { slugify } from "@/lib/utils";
-import { invalidateCache, CACHE_KEYS } from "@/lib/redis";
 import { isDatabaseOnline } from "@/lib/dbHealth";
 
 export const dynamic = "force-dynamic";
@@ -125,12 +124,6 @@ export async function PATCH(
 
     if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-    await invalidateCache([
-      CACHE_KEYS.ALL_PROJECTS,
-      CACHE_KEYS.FEATURED_PROJECTS,
-      CACHE_KEYS.PROJECT(project.slug),
-    ]);
-
     return NextResponse.json({ data: project });
   } catch (error) {
     console.error("PATCH /api/admin/projects/[id] error:", error);
@@ -182,12 +175,6 @@ export async function DELETE(
     }
 
     await Project.deleteOne({ id: projectId });
-
-    await invalidateCache([
-      CACHE_KEYS.ALL_PROJECTS,
-      CACHE_KEYS.FEATURED_PROJECTS,
-      CACHE_KEYS.PROJECT(project.slug),
-    ]);
 
     return NextResponse.json({ success: true });
   } catch (error) {
