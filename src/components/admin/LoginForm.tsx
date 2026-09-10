@@ -70,7 +70,7 @@ export function LoginForm() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="kibria1625@gmail.com"
+            placeholder="Enter your email"
             className={inputClasses}
             suppressHydrationWarning
           />
