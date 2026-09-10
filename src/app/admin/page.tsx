@@ -41,13 +41,13 @@ export default async function AdminPage() {
       projectsData,
       messagesData,
     ] = await Promise.all([
-      Project.countDocuments({}),
+      Project.estimatedDocumentCount(),
       Project.countDocuments({ status: "published" }),
-      ContactSubmission.countDocuments({}),
+      ContactSubmission.estimatedDocumentCount(),
       ContactSubmission.countDocuments({ read: false }),
-      Category.countDocuments({}),
-      Project.find({}).sort({ createdAt: -1 }).limit(5).lean(),
-      ContactSubmission.find({}).sort({ createdAt: -1 }).limit(5).lean(),
+      Category.estimatedDocumentCount(),
+      Project.find({}).sort({ createdAt: -1 }).limit(5).select("id title slug status featured createdAt").lean(),
+      ContactSubmission.find({}).sort({ createdAt: -1 }).limit(5).select("id name email subject message read createdAt").lean(),
     ]);
 
     stats = {

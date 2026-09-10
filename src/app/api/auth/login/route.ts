@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateAdmin, createToken } from "@/lib/auth";
+import { rateLimit, rateLimitedResponse } from "@/lib/rateLimit";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +11,12 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Brute-force protection: max 10 attempts / IP / minute.
+  const limited = rateLimit(request, "login", 10, 60);
+  if (!limited.success) {
+    return rateLimitedResponse(limited.retryAfterSeconds);
+  }
+
   try {
     const body = await request.json();
     const parsed = loginSchema.safeParse(body);
@@ -38,7 +45,7 @@ export async function POST(request: NextRequest) {
     response.cookies.set("admin_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: "/",
     });

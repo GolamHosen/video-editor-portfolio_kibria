@@ -20,18 +20,12 @@ export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  if (pathname?.startsWith("/admin")) {
-    return null;
-  }
-
+  // All hooks must run unconditionally (rules-of-hooks).
   useEffect(() => {
+    if (pathname?.startsWith("/admin")) return;
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setMenuOpen(false);
   }, [pathname]);
 
   // Prevent scroll when menu open
@@ -44,7 +38,13 @@ export function Navbar() {
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  if (pathname?.startsWith("/admin")) {
+    return null;
+  }
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // Always close the mobile menu when a navigation item is pressed.
+    setMenuOpen(false);
     if (href.startsWith("/#") && pathname === "/") {
       e.preventDefault();
       const targetId = href.replace("/#", "");
@@ -52,7 +52,6 @@ export function Navbar() {
       if (target) {
         target.scrollIntoView({ behavior: "smooth" });
       }
-      setMenuOpen(false);
     }
   };
 

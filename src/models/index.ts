@@ -264,6 +264,17 @@ const CommentSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+// ── Indexes for high-performance querying ─────────────────────────────
+ProjectSchema.index({ status: 1, order: 1, createdAt: -1 });
+ProjectSchema.index({ status: 1, featured: -1 });
+ProjectSchema.index({ categoryId: 1 });
+CategorySchema.index({ order: 1 });
+ContactSubmissionSchema.index({ read: 1, createdAt: -1 });
+CommentSchema.index({ status: 1, createdAt: -1 });
+CommentSchema.index({ projectId: 1, status: 1 });
+ServiceSchema.index({ order: 1 });
+TestimonialSchema.index({ featured: 1, order: 1 });
+
 // ── Export Models (Handling Next.js hot-reload model re-declarations) ─
 export const Category: Model<ICategory> =
   mongoose.models.Category || mongoose.model<ICategory>("Category", CategorySchema);

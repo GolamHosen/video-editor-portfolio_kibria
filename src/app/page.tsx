@@ -17,7 +17,8 @@ export const metadata: Metadata = {
     "Premium creative portfolio of a Video Editor, Motion Graphics Designer, and Visual Artist. Cinematic storytelling through creative visuals.",
 };
 
-export const dynamic = "force-dynamic";
+// ISR: re-render every 60s so the public homepage stays fast without touching MongoDB on every hit.
+export const revalidate = 60;
 
 import {
   fallbackServices,

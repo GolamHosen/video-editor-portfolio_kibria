@@ -42,6 +42,7 @@ export function AdminSidebar() {
             <Link
               key={href}
               href={href}
+              prefetch={false}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                 isActive
                   ? "bg-neutral-900 text-white"

@@ -21,7 +21,7 @@ export default async function CategoriesPage() {
   let allCategories: any[] = [];
   try {
     await connectToDatabase();
-    const categoriesData = await Category.find({}).sort({ order: 1 }).lean();
+    const categoriesData = await Category.find({}).sort({ order: 1 }).select("id name slug description order createdAt").lean();
     allCategories = categoriesData.map((c) => ({
       id: c.id,
       name: c.name,

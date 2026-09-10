@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Comment, Project } from "@/models";
 import { z } from "zod";
+import { cacheQuery, publicCacheHeaders, SHORT_CACHE } from "@/lib/cache";
+import { rateLimit, rateLimitedResponse } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -20,43 +22,52 @@ export async function GET(
     const { slug } = await params;
     await connectToDatabase();
 
-    const comments = await Comment.find({
-      projectSlug: slug,
-      status: "approved",
-    })
-      .sort({ createdAt: -1 })
-      .lean();
+    const loadComments = cacheQuery(
+      async () => {
+        const comments = await Comment.find({
+          projectSlug: slug,
+          status: "approved",
+        })
+          .sort({ createdAt: -1 })
+          .lean();
 
-    const totalReviews = comments.length;
-    const sumRatings = comments.reduce((acc, curr) => acc + (curr.rating || 5), 0);
-    const averageRating = totalReviews > 0 ? parseFloat((sumRatings / totalReviews).toFixed(1)) : 5.0;
+        const totalReviews = comments.length;
+        const sumRatings = comments.reduce((acc, curr) => acc + (curr.rating || 5), 0);
+        const averageRating = totalReviews > 0 ? parseFloat((sumRatings / totalReviews).toFixed(1)) : 5.0;
 
-    const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    comments.forEach((c) => {
-      const r = Math.min(5, Math.max(1, Math.round(c.rating || 5))) as 1 | 2 | 3 | 4 | 5;
-      distribution[r] = (distribution[r] || 0) + 1;
-    });
+        const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        comments.forEach((c) => {
+          const r = Math.min(5, Math.max(1, Math.round(c.rating || 5))) as 1 | 2 | 3 | 4 | 5;
+          distribution[r] = (distribution[r] || 0) + 1;
+        });
 
-    const formatted = comments.map((c) => ({
-      id: c.id,
-      projectId: c.projectId,
-      projectSlug: c.projectSlug,
-      projectTitle: c.projectTitle,
-      name: c.name,
-      role: c.role || null,
-      rating: c.rating,
-      comment: c.comment,
-      createdAt: c.createdAt,
-    }));
+        const formatted = comments.map((c) => ({
+          id: c.id,
+          projectId: c.projectId,
+          projectSlug: c.projectSlug,
+          projectTitle: c.projectTitle,
+          name: c.name,
+          role: c.role || null,
+          rating: c.rating,
+          comment: c.comment,
+          createdAt: c.createdAt,
+        }));
 
-    return NextResponse.json({
-      data: formatted,
-      stats: {
-        totalReviews,
-        averageRating,
-        distribution,
+        return {
+          data: formatted,
+          stats: {
+            totalReviews,
+            averageRating,
+            distribution,
+          },
+        };
       },
-    });
+      ["comments", slug],
+      SHORT_CACHE
+    );
+
+    const result = await loadComments();
+    return NextResponse.json(result, { headers: publicCacheHeaders(SHORT_CACHE) });
   } catch (error) {
     console.error("GET /api/projects/[slug]/comments error:", error);
     return NextResponse.json(
@@ -70,6 +81,12 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  // Anti-spam: max 8 comments / IP / minute.
+  const limited = rateLimit(request, "comment", 8, 60);
+  if (!limited.success) {
+    return rateLimitedResponse(limited.retryAfterSeconds);
+  }
+
   try {
     const { slug } = await params;
     const body = await request.json();

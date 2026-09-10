@@ -9,7 +9,8 @@ interface ProjectPageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const dynamic = "force-dynamic";
+// ISR: re-render every 60s so project detail pages stay fast.
+export const revalidate = 60;
 
 async function getProject(slug: string) {
   try {

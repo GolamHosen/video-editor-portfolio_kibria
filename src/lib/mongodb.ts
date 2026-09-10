@@ -20,7 +20,8 @@ if (!global.mongooseCache) {
 }
 
 export async function connectToDatabase(): Promise<typeof mongoose> {
-  if (cached.conn) {
+  // If connection is alive, return cached connection immediately
+  if (cached.conn && mongoose.connection.readyState === 1) {
     return cached.conn;
   }
 
@@ -28,10 +29,19 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
     throw new Error("MONGODB_URI is not configured in environment variables");
   }
 
+  // Reset cache if disconnected or disconnecting
+  if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
+    cached.promise = null;
+    cached.conn = null;
+  }
+
   if (!cached.promise) {
     const opts: mongoose.ConnectOptions = {
-      bufferCommands: false,
+      bufferCommands: true, // Allow commands to buffer briefly during connection
+      maxPoolSize: 10,      // Maintain up to 10 socket connections
+      minPoolSize: 0,       // Do not keep idle sockets open indefinitely
       serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 30000,
       connectTimeoutMS: 5000,
     };
 
@@ -44,6 +54,7 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    cached.conn = null;
     throw e;
   }
 

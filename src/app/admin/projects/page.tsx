@@ -23,8 +23,8 @@ export default async function AdminProjectsPage() {
   try {
     await connectToDatabase();
     const [projectsData, categoriesData] = await Promise.all([
-      Project.find({}).sort({ order: 1, createdAt: -1 }).lean(),
-      Category.find({}).lean(),
+      Project.find({}).sort({ order: 1, createdAt: -1 }).select("id title slug status featured order thumbnailUrl videoPosterUrl videoUrl createdAt categoryId").lean(),
+      Category.find({}).select("id name").lean(),
     ]);
 
     const catMap = new Map(categoriesData.map((c) => [c.id, c.name]));

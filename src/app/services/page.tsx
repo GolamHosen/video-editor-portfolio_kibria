@@ -11,7 +11,8 @@ export const metadata: Metadata = {
     "Professional video editing, motion graphics, graphic design, and branding services. Premium creative solutions for brands worldwide.",
 };
 
-export const dynamic = "force-dynamic";
+// ISR: re-render every 60s so the services page stays fast.
+export const revalidate = 60;
 
 const iconMap: Record<string, string> = {
   film: "🎬",

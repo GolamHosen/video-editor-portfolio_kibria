@@ -21,7 +21,7 @@ export default async function AdminCommentsPage() {
   let allComments: any[] = [];
   try {
     await connectToDatabase();
-    const commentsData = await Comment.find({}).sort({ createdAt: -1 }).lean();
+    const commentsData = await Comment.find({}).sort({ createdAt: -1 }).select("id projectId projectSlug projectTitle name role email rating comment status createdAt").lean();
     allComments = commentsData.map((c) => ({
       id: c.id,
       projectId: c.projectId,

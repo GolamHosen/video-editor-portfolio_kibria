@@ -22,7 +22,7 @@ export default async function MessagesPage() {
   let messages: any[] = [];
   try {
     await connectToDatabase();
-    const data = await ContactSubmission.find({}).sort({ createdAt: -1 }).lean();
+    const data = await ContactSubmission.find({}).sort({ createdAt: -1 }).select("id name email subject message projectType budget read createdAt").lean();
     messages = data.map((m) => ({
       id: m.id,
       name: m.name,

@@ -1,0 +1,15 @@
+
+> dev
+> next dev --webpack -p 3000
+
+▲ Next.js 16.2.6 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.68.100:3000
+- Environments: .env
+✓ Ready in 829ms
+- Experiments (use with caution):
+  · optimizePackageImports
+
+○ Compiling / ...
+ GET /api/health 200 in 13.5s (next.js: 10.9s, proxy.ts: 495ms, application-code: 2.0s)
+ GET / 200 in 15.4s (next.js: 10.9s, proxy.ts: 496ms, application-code: 4.0s)

@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { ContactSubmission } from "@/models";
 import { z } from "zod";
 import { sendContactEmail } from "@/lib/email";
+import { rateLimit, rateLimitedResponse } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,12 @@ const contactSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  // Anti-spam: max 6 messages / IP / minute.
+  const limited = rateLimit(request, "contact", 6, 60);
+  if (!limited.success) {
+    return rateLimitedResponse(limited.retryAfterSeconds);
+  }
+
   try {
     const body = await request.json();
     const parsed = contactSchema.safeParse(body);

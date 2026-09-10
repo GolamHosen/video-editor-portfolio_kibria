@@ -1,21 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 
 export function LoginForm() {
-  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,26 +42,6 @@ export function LoginForm() {
 
   const inputClasses =
     "w-full bg-neutral-900 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-white/30 transition-colors duration-200";
-
-  if (!mounted) {
-    return (
-      <div className="bg-neutral-900 rounded-2xl p-8 border border-white/5 animate-pulse min-h-[380px]">
-        <div className="h-6 w-24 bg-white/10 rounded-lg mb-6" />
-        <div className="space-y-4">
-          <div>
-            <div className="h-3 w-12 bg-white/5 rounded mb-2" />
-            <div className="h-12 bg-white/5 rounded-xl border border-white/5" />
-          </div>
-          <div>
-            <div className="h-3 w-16 bg-white/5 rounded mb-2" />
-            <div className="h-12 bg-white/5 rounded-xl border border-white/5" />
-          </div>
-          <div className="h-12 bg-white/10 rounded-xl mt-2" />
-        </div>
-        <div className="h-4 w-28 bg-white/5 rounded mx-auto mt-6" />
-      </div>
-    );
-  }
 
   return (
     <form
@@ -139,9 +115,9 @@ export function LoginForm() {
       </div>
 
       <p className="text-center mt-6">
-        <a href="/" className="text-neutral-600 hover:text-neutral-400 text-xs transition-colors">
+        <Link href="/" className="text-neutral-600 hover:text-neutral-400 text-xs transition-colors">
           ← Back to website
-        </a>
+        </Link>
       </p>
     </form>
   );

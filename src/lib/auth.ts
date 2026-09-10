@@ -3,8 +3,19 @@ import bcrypt from "bcryptjs";
 import { connectToDatabase } from "@/lib/mongodb";
 import { AdminUser } from "@/models";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-change-in-production";
-const secretKey = new TextEncoder().encode(JWT_SECRET);
+// NEVER hard-code the secret in source. In production, JWT_SECRET must be
+// present in the environment; the dev fallback is intentionally weak and only
+// used when NODE_ENV !== "production".
+const DEV_FALLBACK_SECRET =
+  "dev-insecure-fallback-8f2c1d3a4b5c6d7e8f9a0b1c2d3e4f5a-change-me";
+
+function getSecretKey(): Uint8Array {
+  const secret = process.env.JWT_SECRET || DEV_FALLBACK_SECRET;
+  if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
+    throw new Error("JWT_SECRET is not configured. Set a strong secret in production.");
+  }
+  return new TextEncoder().encode(secret);
+}
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
@@ -19,12 +30,12 @@ export async function createToken(payload: { id: number; email: string }): Promi
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(secretKey);
+    .sign(getSecretKey());
 }
 
 export async function verifyToken(token: string): Promise<{ id: number; email: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, secretKey);
+    const { payload } = await jwtVerify(token, getSecretKey());
     return payload as { id: number; email: string };
   } catch {
     return null;
@@ -35,47 +46,39 @@ export type AuthResult =
   | { success: true; user: { id: number; email: string; name: string } }
   | { success: false; error: string };
 
+// Generic failure message (prevents account enumeration for the public login).
+const GENERIC_AUTH_ERROR = "Invalid email or password.";
+
 /**
- * Ensures the admin account exists in MongoDB with the designated email and hashed password.
+ * Bootstraps the default admin ONLY on first run.
+ *
+ * MongoDB is the single source of truth for admin credentials. ENV vars
+ * (ADMIN_EMAIL / ADMIN_PASSWORD) are used just once, to create the first
+ * admin row when the database has none. They are NEVER re-applied afterwards,
+ * so changing the password in MongoDB is safe and permanent.
  */
 export async function ensureAdminInDatabase(): Promise<void> {
   const targetEmail = (process.env.ADMIN_EMAIL || "kibria1625@gmail.com").toLowerCase().trim();
   const defaultPassword = process.env.ADMIN_PASSWORD || "kibria1625";
 
-  let user = await AdminUser.findOne({ email: targetEmail });
-  if (!user) {
-    const passwordHash = await hashPassword(defaultPassword);
-    // Check if there is an existing admin with id: 1 or any existing admin user
-    const existingAdmin = (await AdminUser.findOne({ id: 1 })) || (await AdminUser.findOne());
-    if (existingAdmin) {
-      existingAdmin.email = targetEmail;
-      existingAdmin.passwordHash = passwordHash;
-      existingAdmin.name = "Golam Kibria";
-      await existingAdmin.save();
-      console.log(`[Auth] Migrated existing admin user to: ${targetEmail}`);
-    } else {
-      await AdminUser.create({
-        id: 1,
-        email: targetEmail,
-        passwordHash,
-        name: "Golam Kibria",
-      });
-      console.log(`[Auth] Stored default admin in database: ${targetEmail}`);
-    }
-  } else {
-    // If the database password hash does not match current password, update it in MongoDB
-    const matches = await verifyPassword(defaultPassword, user.passwordHash);
-    if (!matches) {
-      user.passwordHash = await hashPassword(defaultPassword);
-      await user.save();
-      console.log(`[Auth] Synchronized admin password hash in database for: ${targetEmail}`);
-    }
-  }
+  // If ANY admin already exists in MongoDB, respect the database — do nothing.
+  const anyAdmin = await AdminUser.findOne();
+  if (anyAdmin) return;
+
+  const passwordHash = await hashPassword(defaultPassword);
+  await AdminUser.create({
+    id: 1,
+    email: targetEmail,
+    passwordHash,
+    name: "Golam Kibria",
+  });
+  console.log(`[Auth] Bootstrapped default admin in MongoDB: ${targetEmail}`);
 }
 
 /**
- * Authenticates admin strictly against the MongoDB database.
- * Fetches the user record and password hash directly from the database collection.
+ * Authenticates admin STRICTLY against the MongoDB database.
+ * Fetches the user record and password hash directly from the database collection
+ * and compares with bcrypt. No credentials are ever written during login.
  */
 export async function authenticateAdmin(email: string, password: string): Promise<AuthResult> {
   const inputEmail = email.toLowerCase().trim();
@@ -83,7 +86,7 @@ export async function authenticateAdmin(email: string, password: string): Promis
   try {
     await connectToDatabase();
 
-    // Ensure the admin account exists in the MongoDB database
+    // First-run only bootstrap (no-op when an admin already exists).
     await ensureAdminInDatabase();
 
     // 1. Fetch user record directly from MongoDB database
@@ -92,7 +95,7 @@ export async function authenticateAdmin(email: string, password: string): Promis
     if (!user) {
       return {
         success: false,
-        error: "No admin account found with that email address. Please verify your email.",
+        error: GENERIC_AUTH_ERROR,
       };
     }
 
@@ -101,7 +104,7 @@ export async function authenticateAdmin(email: string, password: string): Promis
     if (!valid) {
       return {
         success: false,
-        error: "Incorrect password. Please check your password and try again.",
+        error: GENERIC_AUTH_ERROR,
       };
     }
 

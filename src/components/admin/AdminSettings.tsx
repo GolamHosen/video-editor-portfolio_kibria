@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Save } from "lucide-react";
+import { Save, KeyRound, AlertCircle, CheckCircle } from "lucide-react";
 import { AdminSidebar } from "./AdminSidebar";
 
 interface Setting {
@@ -22,24 +22,78 @@ export function AdminSettings({ settings: initialSettings }: AdminSettingsProps)
   );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
+
+  // Admin credential fields (stored in MongoDB, NOT env vars)
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [adminName, setAdminName] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [credSaving, setCredSaving] = useState(false);
+  const [credSaved, setCredSaved] = useState(false);
+  const [credError, setCredError] = useState("");
 
   const handleChange = (key: string, value: string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
     setSaved(false);
+    setSaveError("");
   };
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError("");
     try {
-      await fetch("/api/admin/settings", {
+      const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Failed to save settings");
+      }
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+    } catch (err: any) {
+      setSaveError(err.message || "Failed to save settings");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveCredentials = async () => {
+    setCredSaving(true);
+    setCredSaved(false);
+    setCredError("");
+
+    try {
+      const payload: Record<string, string> = { currentPassword };
+      if (adminEmail.trim()) payload.email = adminEmail.trim();
+      if (adminName.trim()) payload.name = adminName.trim();
+      if (newPassword) payload.newPassword = newPassword;
+
+      const res = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json().catch(() => null);
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to update credentials");
+      }
+
+      setCredSaved(true);
+      // Clear the sensitive fields after a successful change.
+      setCurrentPassword("");
+      setAdminEmail("");
+      setAdminName("");
+      setNewPassword("");
+      setTimeout(() => setCredSaved(false), 5000);
+    } catch (err: any) {
+      setCredError(err.message || "Failed to update credentials");
+    } finally {
+      setCredSaving(false);
     }
   };
 
@@ -75,8 +129,10 @@ export function AdminSettings({ settings: initialSettings }: AdminSettingsProps)
           </button>
         </div>
 
-        <div className="p-8 max-w-2xl">
+        <div className="p-8 max-w-2xl space-y-8">
+          {/* Site content settings */}
           <div className="bg-neutral-900 rounded-xl border border-white/5 p-6 space-y-5">
+            <h2 className="text-white font-bold text-sm mb-1">Site Content</h2>
             {initialSettings.map((setting) => (
               <div key={setting.key}>
                 <label className="block text-xs text-neutral-500 mb-2 uppercase tracking-wide font-medium">
@@ -99,6 +155,96 @@ export function AdminSettings({ settings: initialSettings }: AdminSettingsProps)
                 )}
               </div>
             ))}
+            {saveError && (
+              <p className="text-red-400 text-sm">{saveError}</p>
+            )}
+          </div>
+
+          {/* Admin login credentials (stored in MongoDB) */}
+          <div className="bg-neutral-900 rounded-xl border border-white/5 p-6">
+            <h2 className="text-white font-bold text-sm mb-1">Admin Login Credentials</h2>
+            <p className="text-neutral-600 text-xs mb-5">
+              These are stored securely in MongoDB (hashed). Leave a field empty to keep the current value.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs text-neutral-500 mb-2 uppercase tracking-wide font-medium">
+                  Current Password *
+                </label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  autoComplete="current-password"
+                  placeholder="Required to confirm changes"
+                  className={inputClasses}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-neutral-500 mb-2 uppercase tracking-wide font-medium">
+                  Login Email
+                </label>
+                <input
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="new-email@example.com"
+                  className={inputClasses}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-neutral-500 mb-2 uppercase tracking-wide font-medium">
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  value={adminName}
+                  onChange={(e) => setAdminName(e.target.value)}
+                  placeholder="Golam Kibria"
+                  className={inputClasses}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs text-neutral-500 mb-2 uppercase tracking-wide font-medium">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                  placeholder="At least 8 characters"
+                  className={inputClasses}
+                />
+              </div>
+
+              {credError && (
+                <div className="flex items-start gap-2 text-red-400 text-sm">
+                  <AlertCircle size={15} className="shrink-0 mt-0.5" />
+                  <span>{credError}</span>
+                </div>
+              )}
+              {credSaved && (
+                <div className="flex items-start gap-2 text-green-400 text-sm">
+                  <CheckCircle size={15} className="shrink-0 mt-0.5" />
+                  <span>Credentials updated. Use the new credentials on your next login.</span>
+                </div>
+              )}
+
+              <button
+                onClick={handleSaveCredentials}
+                disabled={credSaving || !currentPassword.trim()}
+                className="flex items-center gap-2 bg-white text-black font-bold text-sm px-4 py-2.5 rounded-lg hover:bg-neutral-100 disabled:opacity-50 transition-colors"
+              >
+                <KeyRound size={14} />
+                {credSaving ? "Updating..." : "Update Login Credentials"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { LayoutDashboard, FileVideo, FolderOpen, MessageSquare, Settings, LogOut, Plus, Eye } from "lucide-react";
+import { Plus, Eye, FileVideo, MessageSquare, Settings } from "lucide-react";
+import { AdminSidebar } from "./AdminSidebar";
 
 interface DashboardStats {
   totalProjects: number;
@@ -37,67 +37,10 @@ interface AdminDashboardProps {
   recentMessages: RecentMessage[];
 }
 
-const navItems = [
-  { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/admin/projects", icon: FileVideo, label: "Projects" },
-  { href: "/admin/categories", icon: FolderOpen, label: "Categories" },
-  { href: "/admin/messages", icon: MessageSquare, label: "Messages" },
-  { href: "/admin/settings", icon: Settings, label: "Settings" },
-];
-
 export function AdminDashboard({ user, stats, recentProjects, recentMessages }: AdminDashboardProps) {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/admin/login");
-    router.refresh();
-  };
-
   return (
     <div className="flex min-h-screen bg-neutral-950">
-      {/* Sidebar */}
-      <aside className="w-64 bg-black border-r border-white/5 flex flex-col flex-shrink-0">
-        <div className="p-6 border-b border-white/5">
-          <div className="text-white font-bold text-lg tracking-tight">
-            <span>VISUAL</span>
-            <span className="text-neutral-500">CRAFT</span>
-          </div>
-          <p className="text-neutral-600 text-xs mt-1">Admin Panel</p>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-1">
-          {navItems.map(({ href, icon: Icon, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all duration-200 text-sm font-medium"
-            >
-              <Icon size={16} />
-              {label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-white/5">
-          <div className="flex items-center gap-3 px-3 py-2 mb-2">
-            <div className="w-8 h-8 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-bold text-white">
-              {user.email[0].toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <p className="text-white text-xs font-medium truncate">{user.email}</p>
-              <p className="text-neutral-600 text-xs">Administrator</p>
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-neutral-600 hover:text-red-400 hover:bg-red-500/5 transition-all duration-200 text-sm font-medium"
-          >
-            <LogOut size={16} />
-            Sign out
-          </button>
-        </div>
-      </aside>
+      <AdminSidebar />
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">

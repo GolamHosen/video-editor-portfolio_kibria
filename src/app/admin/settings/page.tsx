@@ -21,7 +21,7 @@ export default async function SettingsPage() {
   let settings: any[] = [];
   try {
     await connectToDatabase();
-    const data = await SiteSetting.find({}).lean();
+    const data = await SiteSetting.find({}).select("id key value type updatedAt").lean();
     settings = data.map((s) => ({
       id: s.id,
       key: s.key,

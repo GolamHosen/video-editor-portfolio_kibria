@@ -11,7 +11,8 @@ export const metadata: Metadata = {
     "Explore the portfolio — video editing, motion graphics, graphic design, and branding projects for clients worldwide.",
 };
 
-export const dynamic = "force-dynamic";
+// ISR: re-render every 60s — portfolio content rarely changes, this keeps the page fast.
+export const revalidate = 60;
 
 async function getWorkData() {
   try {
