@@ -52,3 +52,8 @@ Thumbs.db
 
 # Vercel deployment
 .vercel
+
+cred-test.log/
+cred-test.ps1
+dev-server-out.log
+dev-server.err.log
