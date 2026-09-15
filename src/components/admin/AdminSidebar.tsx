@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, FileVideo, FolderOpen, MessageSquare, Settings, LogOut, Star } from "lucide-react";
+import { LayoutDashboard, FileVideo, FolderOpen, Sparkles, MessageSquare, Settings, LogOut, Star } from "lucide-react";
 
 const navItems = [
   { href: "/admin", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/projects", icon: FileVideo, label: "Projects" },
   { href: "/admin/categories", icon: FolderOpen, label: "Categories" },
+  { href: "/admin/content", icon: Sparkles, label: "Site Content" },
   { href: "/admin/comments", icon: Star, label: "Reviews" },
   { href: "/admin/messages", icon: MessageSquare, label: "Messages" },
   { href: "/admin/settings", icon: Settings, label: "Settings" },

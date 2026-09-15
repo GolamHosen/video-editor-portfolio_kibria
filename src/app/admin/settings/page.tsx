@@ -32,5 +32,26 @@ export default async function SettingsPage() {
   } catch {
     // Database offline — show empty settings
   }
+
+  // Ensure every editable key always shows a field, even before it exists in the DB.
+  // Saving creates the missing rows server-side (PUT /api/admin/settings).
+  const knownKeys = [
+    "hero_title",
+    "hero_subtitle",
+    "hero_cta",
+    "about_title",
+    "about_bio",
+    "about_bio_2",
+    "contact_email",
+    "availability",
+  ];
+  const present = new Set(settings.map((s) => s.key));
+  for (const key of knownKeys) {
+    if (!present.has(key)) {
+      settings.push({ id: 0, key, value: "", type: "text", updatedAt: new Date() });
+    }
+  }
+  settings.sort((a, b) => a.id - b.id || a.key.localeCompare(b.key));
+
   return <AdminSettings settings={settings} />;
 }

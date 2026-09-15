@@ -64,6 +64,7 @@ export async function PUT(request: NextRequest) {
         "hero_cta",
         "about_title",
         "about_bio",
+        "about_bio_2",
         "contact_email",
         "availability",
       ];

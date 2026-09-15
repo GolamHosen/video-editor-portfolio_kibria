@@ -1,0 +1,54 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectToDatabase } from "@/lib/mongodb";
+import { Service } from "@/models";
+import { verifyToken } from "@/lib/auth";
+import { z } from "zod";
+import { isDatabaseOnline } from "@/lib/dbHealth";
+
+export const dynamic = "force-dynamic";
+
+const serviceSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().optional(),
+  icon: z.string().optional(),
+  features: z.array(z.string().min(1)).default([]),
+  order: z.number().default(0),
+});
+
+export async function POST(request: NextRequest) {
+  const token = request.cookies.get("admin_token")?.value;
+  if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const user = await verifyToken(token);
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const online = await isDatabaseOnline();
+  if (!online) {
+    return NextResponse.json(
+      { error: "Database unavailable", message: "MongoDB database is unreachable." },
+      { status: 503 }
+    );
+  }
+
+  try {
+    const body = await request.json();
+    const parsed = serviceSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid data", details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    await connectToDatabase();
+
+    const maxService = await Service.findOne({}).sort({ id: -1 }).lean();
+    const nextId = maxService && maxService.id ? maxService.id + 1 : 1;
+
+    const service = await Service.create({
+      ...parsed.data,
+      id: nextId,
+    });
+
+    return NextResponse.json({ data: service }, { status: 201 });
+  } catch (error) {
+    console.error("POST /api/admin/services error:", error);
+    return NextResponse.json({ error: "Failed to create service" }, { status: 500 });
+  }
+}

@@ -140,3 +140,33 @@ export const fallbackTestimonials = [
     order: 4,
   },
 ];
+
+export const fallbackStats = [
+  { value: "8+", label: "Years of Experience" },
+  { value: "120+", label: "Projects Completed" },
+  { value: "50+", label: "Happy Clients" },
+  { value: "12", label: "Countries Served" },
+];
+
+export const fallbackSkills = [
+  { category: "Video Editing", items: ["Premiere Pro", "DaVinci Resolve", "Final Cut Pro", "Color Grading", "Sound Design"] },
+  { category: "Motion Graphics", items: ["After Effects", "Cinema 4D", "Lottie", "Motion Bro", "Cavalry"] },
+  { category: "Design", items: ["Photoshop", "Illustrator", "Figma", "InDesign", "Procreate"] },
+  { category: "Production", items: ["Direction", "Storyboarding", "Cinematography", "Location Scouting", "Script Writing"] },
+];
+
+export const fallbackExperience = [
+  { year: "2024", title: "International Campaigns", desc: "Delivered video and motion projects for clients across 12 countries." },
+  { year: "2023", title: "Studio Partnership", desc: "Established ongoing partnerships with major creative agencies in London and NYC." },
+  { year: "2022", title: "Award Recognition", desc: "Recognized for excellence in visual storytelling at regional creative awards." },
+  { year: "2020", title: "Freelance Launch", desc: "Launched as an independent creative, focusing on cinematic brand storytelling." },
+  { year: "2016", title: "Creative Journey Begins", desc: "Started as a motion designer at a boutique production studio." },
+];
+
+export const fallbackAboutTitle = "Crafting Stories Through Motion";
+
+export const fallbackBio1 =
+  "I'm a creative visual artist with 8+ years of experience crafting compelling stories through video, motion graphics, and design. I work at the intersection of art and strategy — creating content that moves people and drives results.";
+
+export const fallbackBio2 =
+  "Based globally, working internationally. I partner with brands, agencies, and independent creators to develop visual content that stands out in an increasingly crowded world.";

@@ -8,32 +8,34 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SlideUp, Reveal, FadeIn, StaggerContainer, StaggerItem } from "@/components/animation";
 import { getLenis } from "@/components/providers/LenisProvider";
+import {
+  fallbackStats,
+  fallbackSkills,
+  fallbackExperience,
+  fallbackAboutTitle,
+  fallbackBio1,
+  fallbackBio2,
+} from "@/lib/fallbackData";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const skills = [
-  { category: "Video Editing", items: ["Premiere Pro", "DaVinci Resolve", "Final Cut Pro", "Color Grading", "Sound Design"] },
-  { category: "Motion Graphics", items: ["After Effects", "Cinema 4D", "Lottie", "Motion Bro", "Cavalry"] },
-  { category: "Design", items: ["Photoshop", "Illustrator", "Figma", "InDesign", "Procreate"] },
-  { category: "Production", items: ["Direction", "Storyboarding", "Cinematography", "Location Scouting", "Script Writing"] },
-];
+interface AboutSectionProps {
+  stats?: Array<{ value: string; label: string }>;
+  skills?: Array<{ category: string; items: string[] }>;
+  timeline?: Array<{ year: string; title: string; desc: string }>;
+  aboutTitle?: string;
+  bio1?: string;
+  bio2?: string;
+}
 
-const timeline = [
-  { year: "2024", title: "International Campaigns", desc: "Delivered video and motion projects for clients across 12 countries." },
-  { year: "2023", title: "Studio Partnership", desc: "Established ongoing partnerships with major creative agencies in London and NYC." },
-  { year: "2022", title: "Award Recognition", desc: "Recognized for excellence in visual storytelling at regional creative awards." },
-  { year: "2020", title: "Freelance Launch", desc: "Launched as an independent creative, focusing on cinematic brand storytelling." },
-  { year: "2016", title: "Creative Journey Begins", desc: "Started as a motion designer at a boutique production studio." },
-];
-
-const stats = [
-  { value: "8+", label: "Years of Experience" },
-  { value: "120+", label: "Projects Completed" },
-  { value: "50+", label: "Happy Clients" },
-  { value: "12", label: "Countries Served" },
-];
-
-export function AboutSection() {
+export function AboutSection({
+  stats = fallbackStats,
+  skills = fallbackSkills,
+  timeline = fallbackExperience,
+  aboutTitle = fallbackAboutTitle,
+  bio1 = fallbackBio1,
+  bio2 = fallbackBio2,
+}: AboutSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -144,22 +146,18 @@ export function AboutSection() {
               <h1 className="text-5xl md:text-7xl font-black tracking-tight text-white mt-1 leading-[0.95]">
                 About Me
                 <span className="block text-xl md:text-3xl font-normal text-neutral-400 mt-3 font-sans">
-                  Crafting Stories Through Motion
+                  {aboutTitle}
                 </span>
               </h1>
             </SlideUp>
             <SlideUp delay={0.2}>
               <p className="text-neutral-400 text-base leading-relaxed mt-6 max-w-lg">
-                I&apos;m a creative visual artist with 8+ years of experience crafting compelling
-                stories through video, motion graphics, and design. I work at the intersection
-                of art and strategy — creating content that moves people and drives results.
+                {bio1}
               </p>
             </SlideUp>
             <SlideUp delay={0.3}>
               <p className="text-neutral-500 text-sm leading-relaxed mt-4 max-w-lg">
-                Based globally, working internationally. I partner with brands, agencies, and
-                independent creators to develop visual content that stands out in an increasingly
-                crowded world.
+                {bio2}
               </p>
             </SlideUp>
             <SlideUp delay={0.4}>
@@ -274,7 +272,7 @@ export function AboutSection() {
 
           <div className="space-y-8">
             {timeline.map((item) => (
-              <div key={item.year} className="timeline-item flex flex-col md:flex-row gap-6 md:gap-12">
+              <div key={`${item.year}-${item.title}`} className="timeline-item flex flex-col md:flex-row gap-6 md:gap-12">
                 <div className="w-20 flex-shrink-0">
                   <span className="text-neutral-600 text-sm font-mono">{item.year}</span>
                 </div>

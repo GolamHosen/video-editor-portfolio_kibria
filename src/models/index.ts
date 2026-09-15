@@ -164,6 +164,68 @@ const ServiceSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+// ── Stat Model (dashboard-editable hero / about stats) ──────────────
+export interface IStat extends Document {
+  id: number;
+  label: string;
+  value: string;
+  order: number;
+  createdAt: Date;
+}
+
+const StatSchema: Schema = new Schema(
+  {
+    id: { type: Number, required: true, unique: true },
+    label: { type: String, required: true },
+    value: { type: String, required: true },
+    order: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
+// ── Skill Model (Tools & Skills groups) ─────────────────────────────
+export interface ISkill extends Document {
+  id: number;
+  category: string;
+  items: string[];
+  order: number;
+  createdAt: Date;
+}
+
+const SkillSchema: Schema = new Schema(
+  {
+    id: { type: Number, required: true, unique: true },
+    category: { type: String, required: true },
+    items: { type: [String], default: [] },
+    order: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
+// ── Experience Model (career timeline) ──────────────────────────────
+export interface IExperience extends Document {
+  id: number;
+  year: string;
+  title: string;
+  description?: string;
+  order: number;
+  createdAt: Date;
+}
+
+const ExperienceSchema: Schema = new Schema(
+  {
+    id: { type: Number, required: true, unique: true },
+    year: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String },
+    order: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
 // ── SiteSetting Model ───────────────────────────────────────────────
 export interface ISiteSetting extends Document {
   id: number;
@@ -274,6 +336,9 @@ CommentSchema.index({ status: 1, createdAt: -1 });
 CommentSchema.index({ projectId: 1, status: 1 });
 ServiceSchema.index({ order: 1 });
 TestimonialSchema.index({ featured: 1, order: 1 });
+StatSchema.index({ order: 1 });
+SkillSchema.index({ order: 1 });
+ExperienceSchema.index({ order: 1 });
 
 // ── Export Models (Handling Next.js hot-reload model re-declarations) ─
 export const Category: Model<ICategory> =
@@ -290,6 +355,15 @@ export const Testimonial: Model<ITestimonial> =
 
 export const Service: Model<IService> =
   mongoose.models.Service || mongoose.model<IService>("Service", ServiceSchema);
+
+export const Stat: Model<IStat> =
+  mongoose.models.Stat || mongoose.model<IStat>("Stat", StatSchema);
+
+export const Skill: Model<ISkill> =
+  mongoose.models.Skill || mongoose.model<ISkill>("Skill", SkillSchema);
+
+export const Experience: Model<IExperience> =
+  mongoose.models.Experience || mongoose.model<IExperience>("Experience", ExperienceSchema);
 
 export const SiteSetting: Model<ISiteSetting> =
   mongoose.models.SiteSetting || mongoose.model<ISiteSetting>("SiteSetting", SiteSettingSchema);

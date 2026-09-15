@@ -101,3 +101,28 @@ export interface AdminUser {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface Stat {
+  id: number;
+  label: string;
+  value: string;
+  order: number | null;
+  createdAt?: Date;
+}
+
+export interface Skill {
+  id: number;
+  category: string;
+  items: string[];
+  order: number | null;
+  createdAt?: Date;
+}
+
+export interface ExperienceEntry {
+  id: number;
+  year: string;
+  title: string;
+  description: string | null;
+  order: number | null;
+  createdAt?: Date;
+}

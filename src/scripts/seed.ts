@@ -5,6 +5,9 @@ import {
   Project,
   Testimonial,
   Service,
+  Stat,
+  Skill,
+  Experience,
   SiteSetting,
   AdminUser,
 } from "../models";
@@ -22,6 +25,9 @@ async function seed() {
   await Project.deleteMany({});
   await Testimonial.deleteMany({});
   await Service.deleteMany({});
+  await Stat.deleteMany({});
+  await Skill.deleteMany({});
+  await Experience.deleteMany({});
   await SiteSetting.deleteMany({});
   await AdminUser.deleteMany({});
 
@@ -284,6 +290,41 @@ The tight turnaround required same-day editing of keynote sessions and a final d
   await Service.insertMany(serviceData);
   console.log(`✅ Services: ${serviceData.length}`);
 
+  // Stats (Years of Experience, Projects Done, Happy Clients, etc.)
+  const statData = [
+    { id: 1, value: "8+", label: "Years of Experience", order: 1 },
+    { id: 2, value: "120+", label: "Projects Completed", order: 2 },
+    { id: 3, value: "50+", label: "Happy Clients", order: 3 },
+    { id: 4, value: "12", label: "Countries Served", order: 4 },
+  ];
+
+  await Stat.insertMany(statData);
+  console.log(`✅ Stats: ${statData.length}`);
+
+  // Skills (Tools & Skills groups)
+  const skillData = [
+    { id: 1, category: "Video Editing", items: ["Premiere Pro", "DaVinci Resolve", "Final Cut Pro", "Color Grading", "Sound Design"], order: 1 },
+    { id: 2, category: "Motion Graphics", items: ["After Effects", "Cinema 4D", "Lottie", "Motion Bro", "Cavalry"], order: 2 },
+    { id: 3, category: "Design", items: ["Photoshop", "Illustrator", "Figma", "InDesign", "Procreate"], order: 3 },
+    { id: 4, category: "Production", items: ["Direction", "Storyboarding", "Cinematography", "Location Scouting", "Script Writing"], order: 4 },
+  ];
+
+  await Skill.insertMany(skillData);
+  console.log(`✅ Skills: ${skillData.length}`);
+
+  // Experience (career timeline)
+  const experienceData = [
+    { id: 1, year: "2024", title: "International Campaigns", description: "Delivered video and motion projects for clients across 12 countries.", order: 1 },
+    { id: 2, year: "2023", title: "Studio Partnership", description: "Established ongoing partnerships with major creative agencies in London and NYC.", order: 2 },
+    { id: 3, year: "2022", title: "Award Recognition", description: "Recognized for excellence in visual storytelling at regional creative awards.", order: 3 },
+    { id: 4, year: "2020", title: "Freelance Launch", description: "Launched as an independent creative, focusing on cinematic brand storytelling.", order: 4 },
+    { id: 5, year: "2016", title: "Creative Journey Begins", description: "Started as a motion designer at a boutique production studio.", order: 5 },
+  ];
+
+
+  await Experience.insertMany(experienceData);
+  console.log(`✅ Experience entries: ${experienceData.length}`);
+
   // Site Settings
   const settingsData = [
     { id: 1, key: "hero_title", value: "Creative Visual Storyteller", type: "text" },
@@ -293,6 +334,7 @@ The tight turnaround required same-day editing of keynote sessions and a final d
     { id: 5, key: "about_bio", value: "I'm a creative visual artist with 8+ years of experience crafting compelling stories through video, motion graphics, and design. Based globally, working internationally.", type: "text" },
     { id: 6, key: "contact_email", value: "hello@visualcraft.com", type: "text" },
     { id: 7, key: "availability", value: "Available for new projects", type: "text" },
+    { id: 8, key: "about_bio_2", value: "Based globally, working internationally. I partner with brands, agencies, and independent creators to develop visual content that stands out in an increasingly crowded world.", type: "text" },
   ];
 
   await SiteSetting.insertMany(settingsData);

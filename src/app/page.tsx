@@ -9,7 +9,7 @@ import { TestimonialsSection } from "@/components/sections/TestimonialsSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { SectionNav } from "@/components/layout/SectionNav";
 import { connectToDatabase } from "@/lib/mongodb";
-import { Project, Category, Service, Testimonial } from "@/models";
+import { Project, Category, Service, Testimonial, Stat, SiteSetting } from "@/models";
 
 export const metadata: Metadata = {
   title: "VisualCraft — Video Editor & Motion Designer",
@@ -23,18 +23,40 @@ export const revalidate = 60;
 import {
   fallbackServices,
   fallbackTestimonials,
+  fallbackStats,
+  fallbackSkills,
+  fallbackExperience,
+  fallbackAboutTitle,
+  fallbackBio1,
+  fallbackBio2,
 } from "@/lib/fallbackData";
 
 async function getHomepageData() {
   try {
     await connectToDatabase();
 
-    const [projectsData, categoriesData, servicesData, testimonialsData] = await Promise.all([
-      Project.find({ status: "published" }).sort({ featured: -1, order: 1, createdAt: -1 }).limit(24).lean(),
-      Category.find({}).lean(),
-      Service.find({}).sort({ order: 1 }).lean(),
-      Testimonial.find({ featured: true }).sort({ order: 1 }).limit(6).lean(),
-    ]);
+    const [projectsData, categoriesData, servicesData, testimonialsData, statsData, settingsData] =
+      await Promise.all([
+        Project.find({ status: "published" }).sort({ featured: -1, order: 1, createdAt: -1 }).limit(24).lean(),
+        Category.find({}).lean(),
+        Service.find({}).sort({ order: 1 }).lean(),
+        Testimonial.find({ featured: true }).sort({ order: 1 }).limit(6).lean(),
+        Stat.find({}).sort({ order: 1 }).lean(),
+        SiteSetting.find({ key: { $in: ["about_title", "about_bio", "about_bio_2"] } }).lean(),
+      ]);
+
+    const settingsMap = new Map(settingsData.map((s) => [s.key, s.value || ""]));
+
+    const about = {
+      stats: statsData.length
+        ? statsData.map((s) => ({ value: s.value, label: s.label }))
+        : fallbackStats,
+      skills: fallbackSkills,
+      timeline: fallbackExperience,
+      aboutTitle: settingsMap.get("about_title") || fallbackAboutTitle,
+      bio1: settingsMap.get("about_bio") || fallbackBio1,
+      bio2: settingsMap.get("about_bio_2") || fallbackBio2,
+    };
 
     const catMap = new Map(categoriesData.map((c) => [c.id, c]));
 
@@ -109,6 +131,7 @@ async function getHomepageData() {
               createdAt: t.createdAt,
             }))
           : fallbackTestimonials,
+      about,
     };
   } catch {
     // Database offline — return empty projects
@@ -117,12 +140,21 @@ async function getHomepageData() {
       photoProjects: [],
       allServices: fallbackServices,
       allTestimonials: fallbackTestimonials,
+      about: {
+        stats: fallbackStats,
+        skills: fallbackSkills,
+        timeline: fallbackExperience,
+        aboutTitle: fallbackAboutTitle,
+        bio1: fallbackBio1,
+        bio2: fallbackBio2,
+      },
     };
   }
 }
 
 export default async function HomePage() {
-  const { videoProjects, photoProjects, allServices, allTestimonials } = await getHomepageData();
+  const { videoProjects, photoProjects, allServices, allTestimonials, about } =
+    await getHomepageData();
 
   return (
     <>
@@ -138,7 +170,14 @@ export default async function HomePage() {
         <PhotoSection projects={photoProjects} />
       </Suspense>
 
-      <AboutSection />
+      <AboutSection
+        stats={about.stats}
+        skills={about.skills}
+        timeline={about.timeline}
+        aboutTitle={about.aboutTitle}
+        bio1={about.bio1}
+        bio2={about.bio2}
+      />
 
       <ServicesFullSection services={allServices} />
 

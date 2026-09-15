@@ -103,6 +103,7 @@ export function AdminSettings({ settings: initialSettings }: AdminSettingsProps)
     hero_cta: "Hero CTA Button",
     about_title: "About Page Title",
     about_bio: "About Bio",
+    about_bio_2: "About Bio (Paragraph 2)",
     contact_email: "Contact Email",
     availability: "Availability Status",
   };
