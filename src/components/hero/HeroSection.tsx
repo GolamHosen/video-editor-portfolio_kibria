@@ -143,21 +143,6 @@ export function HeroSection() {
 
       {/* Main content */}
       <div data-hero-content className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20">
-        {/* Label */}
-        <motion.div
-          className="flex items-center gap-3 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
-        >
-          <div className="w-8 h-px bg-neutral-600" />
-          <span className="text-neutral-500 text-xs tracking-[0.3em] uppercase font-medium">
-            Creative Portfolio
-          </span>
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-neutral-600 text-xs">Available for work</span>
-        </motion.div>
-
         {/* Main headline */}
         <div ref={headlineRef}>
           <div className="overflow-hidden">
