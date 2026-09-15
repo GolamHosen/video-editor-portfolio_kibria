@@ -201,7 +201,7 @@ export function ProjectDetailClient({ project, adjacentProjects }: ProjectDetail
             <FadeIn>
               <div
                 onClick={() => openModal(0)}
-                className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-neutral-900 cursor-pointer group border border-white/10"
+                className="relative aspect-16/9 rounded-2xl overflow-hidden bg-neutral-900 cursor-pointer group border border-white/10"
               >
                 <Image
                   src={heroImage}
@@ -222,7 +222,7 @@ export function ProjectDetailClient({ project, adjacentProjects }: ProjectDetail
             </FadeIn>
           ) : (
             <FadeIn>
-              <div className="relative aspect-[16/9] rounded-2xl overflow-hidden bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center text-center p-8 border border-white/5">
+              <div className="relative aspect-16/9 rounded-2xl overflow-hidden bg-linear-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center text-center p-8 border border-white/5">
                 <span className="text-6xl mb-3 text-neutral-600">✦</span>
                 <p className="text-sm font-mono text-neutral-300 uppercase tracking-widest mb-1">{project.title}</p>
                 <p className="text-xs text-neutral-500 max-w-md">
@@ -266,7 +266,7 @@ export function ProjectDetailClient({ project, adjacentProjects }: ProjectDetail
                         <StaggerItem key={item.id}>
                           <div
                             onClick={() => openModal(itemModalIndex)}
-                            className="relative aspect-[16/10] rounded-xl overflow-hidden bg-neutral-900 cursor-pointer group border border-white/5"
+                            className="relative aspect-16/10 rounded-xl overflow-hidden bg-neutral-900 cursor-pointer group border border-white/5"
                           >
                             {item.type === "image" ? (
                               <>
@@ -403,7 +403,7 @@ export function ProjectDetailClient({ project, adjacentProjects }: ProjectDetail
                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                             sizes="(max-width: 640px) 100vw, 50vw"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                          <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
                         </>
                       )}
                       <div className="absolute bottom-4 left-4 right-4 z-10">

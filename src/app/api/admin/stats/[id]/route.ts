@@ -4,6 +4,7 @@ import { Stat } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
 import { isDatabaseOnline } from "@/lib/dbHealth";
+import { revalidatePublicContent } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Stat not found" }, { status: 404 });
     }
 
+    revalidatePublicContent();
     return NextResponse.json({ data: stat });
   } catch (error) {
     console.error("PATCH /api/admin/stats/[id] error:", error);
@@ -93,6 +95,7 @@ export async function DELETE(
 
     await Stat.deleteOne({ id: statId });
 
+    revalidatePublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/admin/stats/[id] error:", error);

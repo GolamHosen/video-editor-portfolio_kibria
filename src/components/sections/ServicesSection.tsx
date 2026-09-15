@@ -76,7 +76,7 @@ export function ServicesSection({ services }: ServicesSectionProps) {
                   <ul className="space-y-1.5">
                     {service.features.slice(0, 3).map((feature) => (
                       <li key={feature} className="flex items-center gap-2 text-neutral-600 text-xs">
-                        <span className="w-1 h-1 rounded-full bg-neutral-600 flex-shrink-0" />
+                        <span className="w-1 h-1 rounded-full bg-neutral-600 shrink-0" />
                         {feature}
                       </li>
                     ))}

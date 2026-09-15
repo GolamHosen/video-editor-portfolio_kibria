@@ -61,7 +61,7 @@ function ProjectCardItem({
     <CardWrapper
       {...(cardProps as any)}
       className={`group relative block overflow-hidden rounded-2xl bg-neutral-900 cursor-pointer ${
-        isLarge ? "md:col-span-2 aspect-[16/9]" : "aspect-[4/3]"
+        isLarge ? "md:col-span-2 aspect-16/9" : "aspect-4/3"
       }`}
       data-cursor={hasVideo ? "play" : "view"}
     >
@@ -78,7 +78,7 @@ function ProjectCardItem({
             preload="metadata"
             className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
         </div>
       ) : thumbnail ? (
         <div className="absolute inset-0">
@@ -91,13 +91,13 @@ function ProjectCardItem({
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             sizes={isLarge ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 100vw, 33vw"}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 bg-linear-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center p-6 text-center">
           <span className="text-4xl mb-2 text-neutral-600 group-hover:scale-110 transition-transform duration-300">✦</span>
           <span className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase">Visual Craft</span>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
         </div>
       )}
 

@@ -106,7 +106,7 @@ export function AdminDashboard({ user, stats, recentProjects, recentMessages }: 
                         {new Date(project.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+                    <div className="flex items-center gap-2 ml-4 shrink-0">
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                           project.status === "published"
@@ -148,7 +148,7 @@ export function AdminDashboard({ user, stats, recentProjects, recentMessages }: 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           {!msg.read && (
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 flex-shrink-0" />
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
                           )}
                           <p className="text-white text-sm font-medium truncate">{msg.name}</p>
                         </div>
@@ -157,7 +157,7 @@ export function AdminDashboard({ user, stats, recentProjects, recentMessages }: 
                           <p className="text-neutral-500 text-xs mt-1 truncate">{msg.subject}</p>
                         )}
                       </div>
-                      <p className="text-neutral-700 text-xs flex-shrink-0">
+                      <p className="text-neutral-700 text-xs shrink-0">
                         {new Date(msg.createdAt).toLocaleDateString()}
                       </p>
                     </div>

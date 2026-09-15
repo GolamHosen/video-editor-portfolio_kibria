@@ -4,6 +4,7 @@ import { Experience } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
 import { isDatabaseOnline } from "@/lib/dbHealth";
+import { revalidatePublicContent } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Experience entry not found" }, { status: 404 });
     }
 
+    revalidatePublicContent();
     return NextResponse.json({ data: experience });
   } catch (error) {
     console.error("PATCH /api/admin/experience/[id] error:", error);
@@ -94,6 +96,7 @@ export async function DELETE(
 
     await Experience.deleteOne({ id: expId });
 
+    revalidatePublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/admin/experience/[id] error:", error);

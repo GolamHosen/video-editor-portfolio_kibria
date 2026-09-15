@@ -182,8 +182,8 @@ export function AboutSection({
           {/* Profile image placeholder */}
           <FadeIn delay={0.3}>
             <div className="relative">
-              <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-neutral-900 relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-950 flex items-center justify-center">
+              <div className="aspect-3/4 rounded-2xl overflow-hidden bg-neutral-900 relative">
+                <div className="absolute inset-0 bg-linear-to-br from-neutral-800 to-neutral-950 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-8xl mb-4">✦</div>
                     <p className="text-neutral-600 text-sm">Profile Image</p>
@@ -268,12 +268,12 @@ export function AboutSection({
 
         <div className="relative">
           {/* Timeline line */}
-          <div className="timeline-line absolute left-[5.5rem] top-0 bottom-0 w-px bg-white/10 hidden md:block" />
+          <div className="timeline-line absolute left-22 top-0 bottom-0 w-px bg-white/10 hidden md:block" />
 
           <div className="space-y-8">
             {timeline.map((item) => (
               <div key={`${item.year}-${item.title}`} className="timeline-item flex flex-col md:flex-row gap-6 md:gap-12">
-                <div className="w-20 flex-shrink-0">
+                <div className="w-20 shrink-0">
                   <span className="text-neutral-600 text-sm font-mono">{item.year}</span>
                 </div>
                 <div className="flex-1 pb-8 border-b border-white/5 last:border-0">

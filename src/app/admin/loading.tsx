@@ -2,7 +2,7 @@ export default function AdminLoading() {
   return (
     <div className="flex min-h-screen bg-neutral-950">
       {/* Sidebar skeleton placeholder */}
-      <div className="w-64 bg-black border-r border-white/5 p-6 flex flex-col gap-4 hidden md:flex flex-shrink-0">
+      <div className="w-64 bg-black border-r border-white/5 p-6 flex flex-col gap-4 hidden md:flex shrink-0">
         <div className="h-6 w-32 bg-neutral-900 rounded animate-pulse" />
         <div className="h-3 w-20 bg-neutral-900/60 rounded animate-pulse" />
         <div className="mt-6 space-y-3">

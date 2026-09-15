@@ -445,7 +445,7 @@ function SkillRow({
           className={`${inputClasses} font-medium`}
           aria-label="Skill group"
         />
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <SaveButton saving={saving} saved={saved} dirty={dirty} onClick={handleSave} />
           <DeleteButton onClick={handleDelete} />
         </div>
@@ -603,7 +603,7 @@ function ExperienceRow({
           className={`${inputClasses} font-medium`}
           aria-label="Title"
         />
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <SaveButton saving={saving} saved={saved} dirty={dirty} onClick={handleSave} />
           <DeleteButton onClick={handleDelete} />
         </div>
@@ -748,7 +748,7 @@ function ServiceRow({
           className={`${inputClasses} font-medium`}
           aria-label="Service title"
         />
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <SaveButton saving={saving} saved={saved} dirty={dirty} onClick={handleSave} />
           <DeleteButton onClick={handleDelete} />
         </div>

@@ -158,7 +158,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection stats={about.stats.slice(0, 3)} />
 
       {/* Video Category Section */}
       <Suspense fallback={null}>

@@ -63,7 +63,7 @@ export function AdminMessages({ messages }: AdminMessagesProps) {
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5 flex-shrink-0">
+                      <div className="mt-0.5 shrink-0">
                         {msg.read ? (
                           <MailOpen size={14} className="text-neutral-600" />
                         ) : (
@@ -75,7 +75,7 @@ export function AdminMessages({ messages }: AdminMessagesProps) {
                           <p className={`text-sm font-medium truncate ${msg.read ? "text-neutral-400" : "text-white"}`}>
                             {msg.name}
                           </p>
-                          <p className="text-neutral-700 text-xs flex-shrink-0">
+                          <p className="text-neutral-700 text-xs shrink-0">
                             {new Date(msg.createdAt).toLocaleDateString()}
                           </p>
                         </div>

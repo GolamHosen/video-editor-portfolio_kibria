@@ -317,7 +317,7 @@ export function ProjectComments({
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-bold text-sm py-3.5 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-[0_0_20px_rgba(245,158,11,0.25)] disabled:opacity-50 cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-linear-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-black font-bold text-sm py-3.5 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-[0_0_20px_rgba(245,158,11,0.25)] disabled:opacity-50 cursor-pointer"
               >
                 {submitting ? (
                   <>
@@ -376,7 +376,7 @@ export function ProjectComments({
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div className="flex items-center gap-3">
                         {/* Initial Avatar */}
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-300 font-bold text-sm flex items-center justify-center uppercase shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-linear-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-300 font-bold text-sm flex items-center justify-center uppercase shrink-0">
                           {item.name.charAt(0) || <User size={16} />}
                         </div>
                         <div>

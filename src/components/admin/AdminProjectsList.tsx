@@ -98,7 +98,7 @@ export function AdminProjectsList({ projects }: AdminProjectsListProps) {
               {filtered.map((project) => (
                 <div key={project.id} className="grid grid-cols-12 gap-4 px-5 py-4 items-center hover:bg-neutral-800/50 transition-colors">
                   <div className="col-span-5 flex items-center gap-3 min-w-0">
-                    <div className="w-12 h-8 rounded-lg overflow-hidden bg-neutral-800 flex-shrink-0 relative">
+                    <div className="w-12 h-8 rounded-lg overflow-hidden bg-neutral-800 shrink-0 relative">
                       {(() => {
                         const thumb = project.thumbnailUrl || project.videoPosterUrl || (project.videoUrl && project.videoUrl.includes('res.cloudinary.com') && project.videoUrl.includes('/video/upload/') ? project.videoUrl.replace(/\.(mp4|webm|mov|m4v|ogv)$/i, '') + '.jpg' : null);
                         if (thumb) {

@@ -6,12 +6,23 @@ import { ArrowDown } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { getLenis } from "@/components/providers/LenisProvider";
+import { fallbackStats } from "@/lib/fallbackData";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-export function HeroSection() {
+interface HeroStat {
+  value: string;
+  label: string;
+}
+
+export function HeroSection({
+  stats = fallbackStats.slice(0, 3),
+}: {
+  stats?: HeroStat[];
+}) {
+  const heroStats = (stats.length > 0 ? stats : fallbackStats).slice(0, 3);
   const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
 
@@ -218,11 +229,7 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.1, ease: EASE }}
           >
-            {[
-              { value: "8+", label: "Years Experience" },
-              { value: "120+", label: "Projects Done" },
-              { value: "50+", label: "Happy Clients" },
-            ].map(({ value, label }) => (
+            {heroStats.map(({ value, label }) => (
               <div key={label} className="text-center">
                 <div className="text-white text-2xl font-black tracking-tight">{value}</div>
                 <div className="text-neutral-600 text-xs tracking-wide mt-1">{label}</div>
@@ -246,7 +253,7 @@ export function HeroSection() {
         >
           <ArrowDown size={16} className="text-neutral-600" />
         </motion.div>
-        <div className="w-px h-12 bg-gradient-to-b from-neutral-600 to-transparent" />
+        <div className="w-px h-12 bg-linear-to-b from-neutral-600 to-transparent" />
       </motion.div>
 
       {/* Side labels */}
@@ -255,7 +262,7 @@ export function HeroSection() {
           style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}>
           Scroll to explore
         </div>
-        <div className="w-px h-16 bg-gradient-to-b from-transparent via-neutral-700 to-transparent" />
+        <div className="w-px h-16 bg-linear-to-b from-transparent via-neutral-700 to-transparent" />
       </div>
     </section>
   );

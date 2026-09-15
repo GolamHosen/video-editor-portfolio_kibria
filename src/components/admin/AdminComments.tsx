@@ -114,7 +114,7 @@ export function AdminComments({ comments: initialComments }: AdminCommentsProps)
                     {/* Left: Reviewer info */}
                     <div className="flex items-start gap-3 min-w-0 flex-1">
                       {/* Avatar */}
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center uppercase shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-linear-to-br from-amber-500/20 to-orange-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center uppercase shrink-0">
                         {c.name.charAt(0)}
                       </div>
                       <div className="min-w-0 flex-1">

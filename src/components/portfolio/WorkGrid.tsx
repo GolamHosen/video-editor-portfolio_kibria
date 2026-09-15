@@ -198,7 +198,7 @@ export function WorkGrid({ projects, categories }: WorkGridProps) {
                         handleOpenMedia(project);
                       }
                     }}
-                    className="group block relative overflow-hidden rounded-xl bg-neutral-900 aspect-[4/3] cursor-pointer border border-white/5 hover:border-white/20 transition-all duration-300 shadow-xl"
+                    className="group block relative overflow-hidden rounded-xl bg-neutral-900 aspect-4/3 cursor-pointer border border-white/5 hover:border-white/20 transition-all duration-300 shadow-xl"
                     data-cursor={hasVideo ? "play" : "view"}
                   >
                     {/* Media: Video preview or Photo */}
@@ -214,7 +214,7 @@ export function WorkGrid({ projects, categories }: WorkGridProps) {
                           preload="metadata"
                           className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
                       </div>
                     ) : thumbnail ? (
                       <div className="absolute inset-0">
@@ -227,10 +227,10 @@ export function WorkGrid({ projects, categories }: WorkGridProps) {
                           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
                       </div>
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-linear-to-br from-neutral-800 to-neutral-900 flex items-center justify-center">
                         <span className="text-6xl opacity-20">✦</span>
                       </div>
                     )}

@@ -4,6 +4,7 @@ import { Service } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
 import { isDatabaseOnline } from "@/lib/dbHealth";
+import { revalidatePublicContent } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export async function POST(request: NextRequest) {
       id: nextId,
     });
 
+    revalidatePublicContent();
     return NextResponse.json({ data: service }, { status: 201 });
   } catch (error) {
     console.error("POST /api/admin/services error:", error);

@@ -63,7 +63,7 @@ function WorkCard({
     <CardWrapper
       {...(cardProps as any)}
       className={`group relative block overflow-hidden rounded-2xl bg-neutral-900/90 border border-white/10 hover:border-white/25 transition-all duration-500 cursor-pointer shadow-2xl ${
-        className || (isFeatured ? "aspect-[16/9]" : "aspect-[16/10]")
+        className || (isFeatured ? "aspect-16/9" : "aspect-16/10")
       }`}
       data-cursor={hasVideo ? "play" : "view"}
     >
@@ -80,7 +80,7 @@ function WorkCard({
             preload="metadata"
             className="w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/35 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
         </div>
       ) : thumbnail ? (
         <div className="absolute inset-0">
@@ -93,13 +93,13 @@ function WorkCard({
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             sizes={isFeatured ? "(max-width: 768px) 100vw, 80vw" : "(max-width: 768px) 100vw, 40vw"}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/35 to-black/10 group-hover:via-black/20 transition-colors duration-300" />
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 bg-linear-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center p-6 text-center">
           <span className="text-4xl mb-2 text-neutral-600 group-hover:scale-110 transition-transform duration-300">✦</span>
           <span className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase">Visual Craft</span>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
         </div>
       )}
 
@@ -265,7 +265,7 @@ export function WorkSection({ projects }: WorkSectionProps) {
                 project={displayProjects[0]}
                 index={0}
                 isFeatured={true}
-                className="aspect-[16/9] w-full"
+                className="aspect-16/9 w-full"
                 onPlayVideo={handlePlayVideo}
               />
             </div>
@@ -278,7 +278,7 @@ export function WorkSection({ projects }: WorkSectionProps) {
                   project={project}
                   index={index}
                   isFeatured={false}
-                  className="aspect-[16/10] w-full"
+                  className="aspect-16/10 w-full"
                   onPlayVideo={handlePlayVideo}
                 />
               ))}
@@ -297,7 +297,7 @@ export function WorkSection({ projects }: WorkSectionProps) {
                     className={
                       isFirst
                         ? "md:col-span-2 lg:col-span-2 aspect-video"
-                        : "aspect-[16/10]"
+                        : "aspect-16/10"
                     }
                     onPlayVideo={handlePlayVideo}
                   />

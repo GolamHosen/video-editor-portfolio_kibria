@@ -4,6 +4,7 @@ import { Skill } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
 import { isDatabaseOnline } from "@/lib/dbHealth";
+import { revalidatePublicContent } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +60,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Skill group not found" }, { status: 404 });
     }
 
+    revalidatePublicContent();
     return NextResponse.json({ data: skill });
   } catch (error) {
     console.error("PATCH /api/admin/skills/[id] error:", error);
@@ -93,6 +95,7 @@ export async function DELETE(
 
     await Skill.deleteOne({ id: skillId });
 
+    revalidatePublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("DELETE /api/admin/skills/[id] error:", error);

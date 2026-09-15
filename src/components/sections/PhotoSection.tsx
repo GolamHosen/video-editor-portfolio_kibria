@@ -55,7 +55,7 @@ function PhotoCard({
         }
       }}
       className={`group relative block overflow-hidden rounded-2xl bg-neutral-900/90 border border-white/10 hover:border-white/25 transition-all duration-500 cursor-pointer shadow-2xl ${
-        className || (isFeatured ? "aspect-[16/10]" : "aspect-[4/3]")
+        className || (isFeatured ? "aspect-16/10" : "aspect-4/3")
       }`}
       data-cursor="view"
     >
@@ -76,15 +76,15 @@ function PhotoCard({
             }
           />
           {/* Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/15 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/30 to-black/10 group-hover:via-black/15 transition-colors duration-300" />
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center p-6 text-center">
+        <div className="absolute inset-0 bg-linear-to-br from-neutral-800 via-neutral-900 to-neutral-950 flex flex-col items-center justify-center p-6 text-center">
           <Camera size={36} className="text-neutral-600 mb-2 group-hover:scale-110 transition-transform duration-300" />
           <span className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase">
             Photo Still
           </span>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/30 to-transparent" />
         </div>
       )}
 
@@ -244,7 +244,7 @@ export function PhotoSection({ projects }: PhotoSectionProps) {
                 project={displayProjects[0]}
                 index={0}
                 isFeatured={true}
-                className="aspect-[16/10] md:aspect-[16/9] w-full"
+                className="aspect-16/10 md:aspect-16/9 w-full"
                 onOpenModal={handleOpenModal}
               />
             </div>
@@ -257,7 +257,7 @@ export function PhotoSection({ projects }: PhotoSectionProps) {
                   project={project}
                   index={index}
                   isFeatured={false}
-                  className="aspect-[4/3] w-full"
+                  className="aspect-4/3 w-full"
                   onOpenModal={handleOpenModal}
                 />
               ))}
@@ -275,8 +275,8 @@ export function PhotoSection({ projects }: PhotoSectionProps) {
                     isFeatured={isFirst}
                     className={
                       isFirst
-                        ? "md:col-span-2 lg:col-span-2 aspect-[16/10]"
-                        : "aspect-[4/3]"
+                        ? "md:col-span-2 lg:col-span-2 aspect-16/10"
+                        : "aspect-4/3"
                     }
                     onOpenModal={handleOpenModal}
                   />

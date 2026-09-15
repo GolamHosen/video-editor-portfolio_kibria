@@ -3,6 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { SiteSetting } from "@/models";
 import { verifyToken } from "@/lib/auth";
 import { z } from "zod";
+import { revalidatePublicContent } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    revalidatePublicContent();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("PUT /api/admin/settings error:", error);

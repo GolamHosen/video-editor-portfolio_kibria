@@ -25,7 +25,7 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-black border-r border-white/5 flex flex-col flex-shrink-0 sticky top-0 h-screen">
+    <aside className="w-64 bg-black border-r border-white/5 flex flex-col shrink-0 sticky top-0 h-screen">
       <div className="p-6 border-b border-white/5">
         <Link href="/admin" className="text-white font-bold text-lg tracking-tight">
           <span>VISUAL</span>
