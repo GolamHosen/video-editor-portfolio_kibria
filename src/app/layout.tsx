@@ -14,8 +14,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "VisualCraft — Video Editor & Motion Designer",
-    template: "%s | VisualCraft",
+    default: "Personal Portfolio — Video Editor & Motion Designer",
+    template: "%s | Personal Portfolio",
   },
   description:
     "Premium creative portfolio of a Video Editor, Motion Graphics Designer, and Visual Artist. Cinematic storytelling through creative visuals.",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
         : process.env.VERCEL_URL
           ? `https://${process.env.VERCEL_URL}`
           : "http://localhost:3000",
-    title: "VisualCraft — Video Editor & Motion Designer",
+    title: "Personal Portfolio — Video Editor & Motion Designer",
     description:
       "Premium creative portfolio showcasing cinematic video editing, motion graphics, and graphic design.",
     siteName: "VisualCraft",
