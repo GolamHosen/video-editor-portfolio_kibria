@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -47,23 +47,21 @@ export function WorkGrid({ projects, categories }: WorkGridProps) {
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get("category");
 
-  const [activeCategory, setActiveCategory] = useState("all");
+  // A filter click overrides the URL filter; `null` means "follow the URL".
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Sync category from URL if present
-  useEffect(() => {
-    if (urlCategory) {
-      const match = categories.find(
-        (c) => c.slug.toLowerCase() === urlCategory.toLowerCase()
-      );
-      if (match) {
-        setActiveCategory(match.slug);
-      } else if (urlCategory.toLowerCase() === "all") {
-        setActiveCategory("all");
-      }
-    }
+  // Derived during render (instead of synced through an Effect) so an incoming
+  // ?category=... filter applies immediately, without a second render pass.
+  const urlCategorySlug = useMemo(() => {
+    if (!urlCategory) return null;
+    const target = urlCategory.toLowerCase();
+    if (target === "all") return "all";
+    return categories.find((c) => c.slug.toLowerCase() === target)?.slug ?? null;
   }, [urlCategory, categories]);
+
+  const activeCategory = selectedCategory ?? urlCategorySlug ?? "all";
 
   const allFilters = [
     { id: "all", name: "All", slug: "all" },
@@ -71,7 +69,7 @@ export function WorkGrid({ projects, categories }: WorkGridProps) {
   ];
 
   const handleFilterClick = (slug: string) => {
-    setActiveCategory(slug);
+    setSelectedCategory(slug);
     if (typeof window !== "undefined") {
       const newUrl = slug === "all" ? "/work" : `/work?category=${slug}`;
       window.history.replaceState(null, "", newUrl);

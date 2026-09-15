@@ -42,7 +42,7 @@ export function Footer() {
   const scrollToSection = (sectionId: string) => {
     if (!isHomePage) {
       // If not on homepage, navigate there
-      window.location.href = `/#${sectionId}`;
+      window.location.assign(`/#${sectionId}`);
       return;
     }
     const lenis = getLenis();

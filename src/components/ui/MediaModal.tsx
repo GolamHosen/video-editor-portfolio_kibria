@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronLeft, ChevronRight, Maximize2, Minimize2, Play } from "lucide-react";
 import { VideoPlayer } from "./VideoPlayer";
@@ -33,23 +33,33 @@ export function MediaModal({
   currentIndex,
   onNavigate,
 }: MediaModalProps) {
-  const [index, setIndex] = useState(currentIndex);
+  // Fully controlled: `currentIndex` (owned by the parent) is the single source
+  // of truth, so no local index state + sync Effect is needed.
+  const index =
+    items.length > 0 ? Math.min(Math.max(currentIndex, 0), items.length - 1) : 0;
+
+  const handlePrev = useCallback(() => {
+    if (items.length < 2) return;
+    onNavigate?.(index === 0 ? items.length - 1 : index - 1);
+  }, [index, items.length, onNavigate]);
+
+  const handleNext = useCallback(() => {
+    if (items.length < 2) return;
+    onNavigate?.(index === items.length - 1 ? 0 : index + 1);
+  }, [index, items.length, onNavigate]);
 
   useEffect(() => {
-    setIndex(currentIndex);
-  }, [currentIndex]);
+    if (!isOpen) return;
 
-  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
       if (e.key === "Escape") onClose();
-      if (e.key === "ArrowLeft" && items.length > 1) handlePrev();
-      if (e.key === "ArrowRight" && items.length > 1) handleNext();
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, index, items.length]);
+  }, [isOpen, onClose, handlePrev, handleNext]);
 
   // Lock scroll when open
   useEffect(() => {
@@ -64,18 +74,6 @@ export function MediaModal({
   }, [isOpen]);
 
   const currentItem = items[index];
-
-  const handlePrev = () => {
-    const newIdx = index === 0 ? items.length - 1 : index - 1;
-    setIndex(newIdx);
-    onNavigate?.(newIdx);
-  };
-
-  const handleNext = () => {
-    const newIdx = index === items.length - 1 ? 0 : index + 1;
-    setIndex(newIdx);
-    onNavigate?.(newIdx);
-  };
 
   if (!isOpen || !currentItem) return null;
 

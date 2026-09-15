@@ -9,7 +9,6 @@ interface MongooseCache {
 
 declare global {
   // Allow global caching in Node.js development mode
-  // eslint-disable-next-line no-var
   var mongooseCache: MongooseCache | undefined;
 }
 
