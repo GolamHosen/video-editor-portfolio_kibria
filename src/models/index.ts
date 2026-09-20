@@ -339,6 +339,7 @@ TestimonialSchema.index({ featured: 1, order: 1 });
 StatSchema.index({ order: 1 });
 SkillSchema.index({ order: 1 });
 ExperienceSchema.index({ order: 1 });
+AdminUserSchema.index({ email: 1 });
 
 // ── Export Models (Handling Next.js hot-reload model re-declarations) ─
 export const Category: Model<ICategory> =

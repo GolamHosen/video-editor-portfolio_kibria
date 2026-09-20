@@ -1,20 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
+  // Prefetch admin route in browser so navigation is instant
+  useEffect(() => {
+    router.prefetch("/admin");
+  }, [router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading || isRedirecting) return;
+
     setLoading(true);
     setError("");
 
@@ -22,20 +30,21 @@ export function LoginForm() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
         setError(data.error || "Authentication failed. Please check your credentials.");
+        setLoading(false);
       } else {
-        router.push("/admin");
-        router.refresh();
+        setIsRedirecting(true);
+        // Clean navigation that transmits the newly set auth cookie without duplicate SSR calls
+        window.location.assign("/admin");
       }
     } catch {
       setError("An unexpected network error occurred. Please check your connection.");
-    } finally {
       setLoading(false);
     }
   };
@@ -106,11 +115,23 @@ export function LoginForm() {
 
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-white text-black font-bold text-sm px-6 py-4 rounded-xl hover:bg-neutral-100 disabled:opacity-50 transition-all duration-200 mt-2"
+          disabled={loading || isRedirecting}
+          className="w-full bg-white text-black font-bold text-sm px-6 py-4 rounded-xl hover:bg-neutral-100 disabled:opacity-50 transition-all duration-200 mt-2 flex items-center justify-center gap-2"
           suppressHydrationWarning
         >
-          {loading ? "Signing in..." : "Sign In"}
+          {isRedirecting ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              <span>Redirecting...</span>
+            </>
+          ) : loading ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              <span>Signing in...</span>
+            </>
+          ) : (
+            "Sign In"
+          )}
         </button>
       </div>
 

@@ -38,7 +38,8 @@ export async function connectToDatabase(): Promise<typeof mongoose> {
     const opts: mongoose.ConnectOptions = {
       bufferCommands: true, // Allow commands to buffer briefly during connection
       maxPoolSize: 10,      // Maintain up to 10 socket connections
-      minPoolSize: 0,       // Do not keep idle sockets open indefinitely
+      minPoolSize: 1,       // Keep at least 1 persistent connection warm to avoid handshake latency
+      maxIdleTimeMS: 45000, // Re-use connection sockets efficiently
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 30000,
       connectTimeoutMS: 5000,

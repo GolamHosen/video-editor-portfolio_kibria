@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LoginForm } from "@/components/admin/LoginForm";
+import { connectToDatabase } from "@/lib/mongodb";
 
 export const metadata: Metadata = {
   title: "Admin Login | VisualCraft",
@@ -7,6 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLoginPage() {
+  // Pre-warm the MongoDB connection while the user views/fills the login form
+  connectToDatabase().catch(() => {});
+
   return (
     <div className="min-h-screen bg-neutral-950 flex items-center justify-center px-6">
       <div className="w-full max-w-md">

@@ -17,14 +17,20 @@ function getSecretKey(): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
+// ── Bcrypt helpers ──────────────────────────────────────────────────
+// 10 rounds is the industry standard (bcrypt default). 12 rounds doubles
+// the hashing time for negligible security gain in an admin-only login.
+const BCRYPT_ROUNDS = 10;
+
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
+  return bcrypt.hash(password, BCRYPT_ROUNDS);
 }
 
 export async function verifyPassword(password: string, hash: string): Promise<boolean> {
   return bcrypt.compare(password, hash);
 }
 
+// ── JWT helpers ─────────────────────────────────────────────────────
 export async function createToken(payload: { id: number; email: string }): Promise<string> {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
@@ -49,21 +55,26 @@ export type AuthResult =
 // Generic failure message (prevents account enumeration for the public login).
 const GENERIC_AUTH_ERROR = "Invalid email or password.";
 
+// ── Bootstrap cache ─────────────────────────────────────────────────
+// Track whether the default admin has been bootstrapped during this process
+// lifetime. Once verified, we never check the DB again — eliminates an
+// extra findOne on every single login attempt.
+let adminBootstrapped = false;
+
 /**
- * Bootstraps the default admin ONLY on first run.
- *
- * MongoDB is the single source of truth for admin credentials. ENV vars
- * (ADMIN_EMAIL / ADMIN_PASSWORD) are used just once, to create the first
- * admin row when the database has none. They are NEVER re-applied afterwards,
- * so changing the password in MongoDB is safe and permanent.
+ * Bootstraps the default admin ONLY on first run if database is empty.
  */
-export async function ensureAdminInDatabase(): Promise<void> {
+async function ensureAdminInDatabase(): Promise<void> {
+  if (adminBootstrapped) return;
+
   const targetEmail = (process.env.ADMIN_EMAIL || "kibria1625@gmail.com").toLowerCase().trim();
   const defaultPassword = process.env.ADMIN_PASSWORD || "kibria1625";
 
-  // If ANY admin already exists in MongoDB, respect the database — do nothing.
-  const anyAdmin = await AdminUser.findOne();
-  if (anyAdmin) return;
+  const anyAdmin = await AdminUser.findOne().lean();
+  if (anyAdmin) {
+    adminBootstrapped = true;
+    return;
+  }
 
   const passwordHash = await hashPassword(defaultPassword);
   await AdminUser.create({
@@ -72,13 +83,23 @@ export async function ensureAdminInDatabase(): Promise<void> {
     passwordHash,
     name: "Golam Kibria",
   });
+  adminBootstrapped = true;
   console.log(`[Auth] Bootstrapped default admin in MongoDB: ${targetEmail}`);
 }
+
+// Re-export for external callers that might need it (e.g. seed scripts).
+export { ensureAdminInDatabase };
 
 /**
  * Authenticates admin STRICTLY against the MongoDB database.
  * Fetches the user record and password hash directly from the database collection
- * and compares with bcrypt. No credentials are ever written during login.
+ * and compares with bcrypt.
+ *
+ * Professional performance optimizations:
+ *  1. Single DB query for normal login (bypasses bootstrap check when admin found).
+ *  2. Uses .select("id email passwordHash name") to transfer only required fields.
+ *  3. Uses .lean() to skip Mongoose document hydration.
+ *  4. Fast-path bootstrap: only triggers if email is not found and DB is brand new.
  */
 export async function authenticateAdmin(email: string, password: string): Promise<AuthResult> {
   const inputEmail = email.toLowerCase().trim();
@@ -86,11 +107,26 @@ export async function authenticateAdmin(email: string, password: string): Promis
   try {
     await connectToDatabase();
 
-    // First-run only bootstrap (no-op when an admin already exists).
-    await ensureAdminInDatabase();
+    // 1. Fast direct lookup with lean projection (1 single DB roundtrip)
+    let user = await AdminUser.findOne({ email: inputEmail })
+      .select("id email passwordHash name")
+      .lean();
 
-    // 1. Fetch user record directly from MongoDB database
-    const user = await AdminUser.findOne({ email: inputEmail });
+    // If user not found and bootstrap hasn't run, check if DB is empty (first run only)
+    if (!user && !adminBootstrapped) {
+      const adminExists = await AdminUser.exists({});
+      if (!adminExists) {
+        await ensureAdminInDatabase();
+        // Re-check in case the bootstrapped account matches the input email
+        user = await AdminUser.findOne({ email: inputEmail })
+          .select("id email passwordHash name")
+          .lean();
+      } else {
+        adminBootstrapped = true;
+      }
+    } else if (user) {
+      adminBootstrapped = true;
+    }
 
     if (!user) {
       return {
@@ -99,8 +135,9 @@ export async function authenticateAdmin(email: string, password: string): Promis
       };
     }
 
-    // 2. Fetch stored password hash from the database document and compare with bcrypt
+    // 2. Compare password with bcrypt
     const valid = await verifyPassword(password, user.passwordHash);
+
     if (!valid) {
       return {
         success: false,
@@ -108,7 +145,7 @@ export async function authenticateAdmin(email: string, password: string): Promis
       };
     }
 
-    // 3. Return user data fetched directly from the database document
+    // 3. Return user data
     return {
       success: true,
       user: {
