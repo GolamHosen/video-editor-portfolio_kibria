@@ -102,35 +102,58 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
     setError("");
 
     try {
-      const sigRes = await fetch("/api/upload/signature?folder=portfolio");
-      if (!sigRes.ok) {
-        throw new Error("Failed to get Cloudinary upload authorization signature");
-      }
-      const { signature, timestamp, cloudName, apiKey } = await sigRes.json();
-
       const isVideo = file.type.startsWith("video/");
       const resourceType = isVideo ? "video" : "image";
+      const PROXY_LIMIT = 4 * 1024 * 1024; // 4MB — Vercel serverless body limit
 
-      const formDataUpload = new FormData();
-      formDataUpload.append("file", file);
-      formDataUpload.append("api_key", apiKey);
-      formDataUpload.append("timestamp", timestamp.toString());
-      formDataUpload.append("signature", signature);
-      formDataUpload.append("folder", "portfolio");
+      let uploadData: { secure_url: string; public_id: string };
 
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+      if (file.size <= PROXY_LIMIT) {
+        // ── Small file: upload through our API proxy (no CORS) ──
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("folder", "portfolio");
+        fd.append("resource_type", resourceType);
+        fd.append("mode", "proxy");
 
-      const uploadRes = await fetch(uploadUrl, {
-        method: "POST",
-        body: formDataUpload,
-      });
+        const res = await fetch("/api/upload", { method: "POST", body: fd });
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "Upload failed");
+        }
+        uploadData = await res.json();
+      } else {
+        // ── Large file: get signed params, then upload directly to Cloudinary ──
+        // Step 1 — get a server-generated signature (secure, no secrets exposed)
+        const fd = new FormData();
+        fd.append("mode", "sign");
+        fd.append("folder", "portfolio");
+        fd.append("resource_type", resourceType);
 
-      if (!uploadRes.ok) {
-        const errJson = await uploadRes.json();
-        throw new Error(errJson.error?.message || "Upload to Cloudinary failed");
+        const sigRes = await fetch("/api/upload", { method: "POST", body: fd });
+        if (!sigRes.ok) {
+          const err = await sigRes.json();
+          throw new Error(err.error || "Failed to authorize upload");
+        }
+        const { signature, timestamp, cloudName, apiKey, folder } = await sigRes.json();
+
+        // Step 2 — upload directly to Cloudinary with signed params
+        const cloudFd = new FormData();
+        cloudFd.append("file", file);
+        cloudFd.append("api_key", apiKey);
+        cloudFd.append("timestamp", timestamp.toString());
+        cloudFd.append("signature", signature);
+        cloudFd.append("folder", folder);
+
+        const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`;
+        const uploadRes = await fetch(uploadUrl, { method: "POST", body: cloudFd });
+
+        if (!uploadRes.ok) {
+          const errJson = await uploadRes.json();
+          throw new Error(errJson.error?.message || "Upload failed");
+        }
+        uploadData = await uploadRes.json();
       }
-
-      const uploadData = await uploadRes.json();
 
       const isVideoField = targetField === "videoUrl";
       const autoPoster = isVideoField && !formData.videoPosterUrl
@@ -144,8 +167,8 @@ export function ProjectForm({ project, categories }: ProjectFormProps) {
         ...(autoPoster ? { videoPosterUrl: autoPoster } : {}),
       }));
     } catch (err: any) {
-      console.error("Cloudinary upload error:", err);
-      setError(err.message || "Failed to upload file to Cloudinary");
+      console.error("Upload error:", err);
+      setError(err.message || "Failed to upload file");
     } finally {
       setUploadingField(null);
     }
